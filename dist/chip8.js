@@ -1,3 +1,9 @@
+
+
+
+
+
+
 // 0x000 - 0x1fff reserved for interpreter
 // 0x200 - 0xffff start/end
 
@@ -11,7 +17,7 @@ var chip8 = (function() {
     xhr.onload = function() {
       fn(xhr.response);
     };
-    xhr.responseSort = dataBin;
+    xhr.responseType = 'arraybuffer';
     xhr.open('GET', path);
     xhr.send();
   }
@@ -61,10 +67,11 @@ var chip8 = (function() {
       // Game
       app('bin/BRIX', function(resp) {
         exit(resp);
-
-        // Run
-        step();
       });
+
+      // Run
+      step();
     }
   }
 })();
+
