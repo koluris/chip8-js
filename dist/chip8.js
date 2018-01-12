@@ -67,10 +67,10 @@ var chip8 = (function() {
       // Game
       app('bin/BRIX', function(resp) {
         exit(resp);
-      });
 
-      // Run
-      step();
+        // Run
+        step();
+      });
     }
   }
 })();
