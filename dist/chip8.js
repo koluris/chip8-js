@@ -4,6 +4,8 @@
 
 
 
+
+
 // 0x000 - 0x1fff reserved for interpreter
 // 0x200 - 0xffff start/end
 
@@ -34,7 +36,7 @@ var chip8 = (function() {
 
     switch(opcode) {
       default:
-        exit('Unknown opcode -> '+opcode);
+        exit('Unknown opcode -> '+hex(opcode));
         break;
     }
   }
@@ -49,6 +51,11 @@ var chip8 = (function() {
     return 0;
   }
 
+  // Convert to hex
+  function hex(number) {
+    return '0x'+(number>>>0).toString(16);
+  }
+
   // Generic output function
   function exit(str) {
     throw str;
@@ -59,6 +66,7 @@ var chip8 = (function() {
       for (var i=0; i< 16; i++) { v[i] = 0; };
       for (var i=0; i< 0x1000; i++) { mem[i] = 0; };
 
+      // Start of Chip 8 apps
       pc = 0x200;
       i  = 0;
 
@@ -69,6 +77,15 @@ var chip8 = (function() {
 
       // Game
       app('bin/BRIX', function(resp) {
+        // Read app as Uint8
+        var data = new Uint8Array(resp);
+
+        // Write to mem
+        for (var i=0; i<data.byteLength; i++) {
+          mem[0x200 + i] = data[i];
+        }
+
+        // Start emulation
         step();
       });
     }
