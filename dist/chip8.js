@@ -7,11 +7,16 @@
 // 0x000 - 0x1fff reserved for interpreter
 // 0x200 - 0xffff start/end
 
+
+
+
+
+
 var chip8 = (function() {
   // General purpose
   var v = [], mem = [], pc, i, timer;
 
-  // Read app
+  // Request for app read
   function app(path, fn) {
     var xhr = new XMLHttpRequest();
     xhr.onload = function() {
@@ -22,15 +27,7 @@ var chip8 = (function() {
     xhr.send();
   }
 
-  function read(pc) {
-    if (pc >= 0x200 && pc <= 0xfff) {
-      return mem[pc];
-    }
-    else {
-      exit('Unknown mem read -> '+pc);
-    }
-  }
-
+  // CPU step
   function step() {
     var opcode = read(pc);
     pc++;
@@ -42,19 +39,25 @@ var chip8 = (function() {
     }
   }
 
+  // Mem read
+  function read(addr) {
+    if (addr >= 0x200 && addr <= 0xfff) {
+      return mem[pc];
+    }
+    
+    exit('Unknown mem read -> '+pc);
+    return 0;
+  }
+
+  // Generic output function
   function exit(str) {
     throw str;
   }
 
   return {
     reset: function() {
-      for (var i=0; i<16; i++) {
-        v[i] = 0;
-      }
-
-      for (var i=0; i<0xfff; i++) {
-        mem[i] = 0;
-      }
+      for (var i=0; i< 16; i++) { v[i] = 0; };
+      for (var i=0; i< 0x1000; i++) { mem[i] = 0; };
 
       pc = 0x200;
       i  = 0;
@@ -66,9 +69,6 @@ var chip8 = (function() {
 
       // Game
       app('bin/BRIX', function(resp) {
-        exit(resp);
-
-        // Run
         step();
       });
     }
