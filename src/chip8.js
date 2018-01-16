@@ -20,7 +20,7 @@ chip8.CstrMain = (function() {
       render.reset('#canvas');
 
       // Game
-      request('bin/BRIX', function(resp) {
+      request('bin/MAZE', function(resp) {
         // Write app to mem
         mem.upload(resp);
 
