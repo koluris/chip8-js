@@ -19,7 +19,7 @@ chip8.CstrMain = (function() {
       cpu.reset();
 
       // Game
-      request('bin/BRIX', function(resp) {
+      request('bin/MAZE', function(resp) {
         // Write app to mem
         mem.upload(resp);
 

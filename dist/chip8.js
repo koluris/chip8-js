@@ -44,7 +44,7 @@ chip8.CstrMain = (function() {
       chip8.CstrProcessor.reset();
 
       // Game
-      request('bin/BRIX', function(resp) {
+      request('bin/MAZE', function(resp) {
         // Write app to chip8.CstrMem
         chip8.CstrMem.upload(resp);
 
