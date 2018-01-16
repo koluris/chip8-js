@@ -3,16 +3,28 @@
 <head>
   <meta charset="utf-8"/>
   <title>Chip 8</title>
+
+  <STYLE>
+    @import url('css/normalize.css');
+
+    #canvas {
+      zoom: 1000%;
+      image-rendering: pixelated;
+    }
+  </STYLE>
 </head>
 <BODY>
   <!-- Canvas -->
-  <canvas width="64" HEIGHT="32"></canvas>
+  <canvas id="canvas" width="64" HEIGHT="32"></canvas>
 
   <!-- Scripts -->
+  <script src="dist/quer-3.2.1.min.js"></script>
   <script src="dist/chip8.js"></script>
 
   <script>
-    chip8.CstrMain.reset();
+    $(function() {
+      chip8.CstrMain.reset();
+    });
   </script>
 </BODY>
 </html>

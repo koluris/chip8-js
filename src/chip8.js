@@ -15,8 +15,9 @@ chip8.CstrMain = (function() {
 
   return {
     reset: function() {
-      mem.reset();
-      cpu.reset();
+         mem.reset();
+         cpu.reset();
+      render.reset('#canvas');
 
       // Game
       request('bin/BRIX', function(resp) {

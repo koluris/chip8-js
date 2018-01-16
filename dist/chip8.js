@@ -8,6 +8,7 @@
 
 
 
+
 var chip8 = {};
 
 
@@ -18,6 +19,8 @@ var chip8 = {};
 
 // 0x000 - 0x1fff reserved for interpreter
 // 0x200 - 0xffff start/end
+
+
 
 
 
@@ -40,8 +43,9 @@ chip8.CstrMain = (function() {
 
   return {
     reset: function() {
-      chip8.CstrMem.reset();
-      chip8.CstrProcessor.reset();
+         chip8.CstrMem.reset();
+         chip8.CstrProcessor.reset();
+      chip8.CstrGraphics.reset('#canvas');
 
       // Game
       request('bin/BRIX', function(resp) {
@@ -142,6 +146,33 @@ chip8.CstrMem = (function() {
       
       exit('Unknown mem read -> '+addr);
       return 0;
+    }
+  };
+})();
+chip8.CstrGraphics = (function() {
+  var canvas, ctx;
+
+  return {
+    reset: function(divCanvas) {
+      canvas = $(divCanvas)[0];
+      ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(300, 150);
+      ctx.strokeStyle = '#fff';
+      ctx.stroke();
+    },
+
+    update: function() {
+      // for (var v=0; v<32; v++) {
+      //   for (var ((opcode>>>8)&0xf)=0; ((opcode>>>8)&0xf)<64; ((opcode>>>8)&0xf)++) {
+      //     area
+      //   }
+      // }
     }
   };
 })();
