@@ -29,6 +29,10 @@ chip8.CstrProcessor = (function() {
     console.dir(emu.hex(opcode));
 
     switch(__id) {
+      case 0x1:
+        pc = __nnn;
+        break;
+
       case 0x3:
         if (v[__h] === __kk) {
           pc+=2;
@@ -37,6 +41,10 @@ chip8.CstrProcessor = (function() {
 
       case 0x6:
         v[__h] = __kk;
+        break;
+
+      case 0x7:
+        v[__h] += __kk;
         break;
 
       case 0xa:
@@ -51,6 +59,9 @@ chip8.CstrProcessor = (function() {
         console.dir(__h);
         console.dir(__v);
         console.dir('BYTE -> '+__n);
+
+        // Read from I until I+__n from ram
+        // Render v[__h], v[__v]
         break;
 
       default:

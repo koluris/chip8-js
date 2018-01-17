@@ -99,6 +99,10 @@ chip8.CstrProcessor = (function() {
     console.dir(chip8.CstrMain.hex(opcode));
 
     switch(((opcode>>>12)&0xf)) {
+      case 0x1:
+        //pc = (opcode&0xfff);
+        break;
+
       case 0x3:
         if (v[((opcode>>>8)&0xf)] === (opcode&0xff)) {
           pc+=2;
@@ -107,6 +111,10 @@ chip8.CstrProcessor = (function() {
 
       case 0x6:
         v[((opcode>>>8)&0xf)] = (opcode&0xff);
+        break;
+
+      case 0x7:
+        v[((opcode>>>8)&0xf)] += (opcode&0xff);
         break;
 
       case 0xa:
@@ -121,6 +129,9 @@ chip8.CstrProcessor = (function() {
         console.dir(((opcode>>>8)&0xf));
         console.dir(((opcode>>>4)&0xf));
         console.dir('BYTE -> '+(opcode&0xf));
+
+        // Read from I until I+(opcode&0xf) from ram
+        // Render v[((opcode>>>8)&0xf)], v[((opcode>>>4)&0xf)]
         break;
 
       default:
