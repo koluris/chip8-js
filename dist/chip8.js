@@ -77,6 +77,15 @@ chip8.CstrMain = (function() {
 
 
 
+
+
+
+
+
+
+
+
+
 chip8.CstrProcessor = (function() {
   // General purpose
   var v = [], pc, i, timer;
@@ -90,8 +99,28 @@ chip8.CstrProcessor = (function() {
     console.dir(chip8.CstrMain.hex(opcode));
 
     switch(((opcode>>>12)&0xf)) {
-      case 6:
+      case 0x3:
+        if (v[((opcode>>>8)&0xf)] === (opcode&0xff)) {
+          pc+=2;
+        }
+        break;
+
+      case 0x6:
         v[((opcode>>>8)&0xf)] = (opcode&0xff);
+        break;
+
+      case 0xa:
+        i = (opcode&0xfff);
+        break;
+
+      case 0xc:
+        v[((opcode>>>8)&0xf)] = Math.floor(Math.random() * 256) & (opcode&0xff);
+        break;
+
+      case 0xd:
+        console.dir(((opcode>>>8)&0xf));
+        console.dir(((opcode>>>4)&0xf));
+        console.dir('BYTE -> '+(opcode&0xf));
         break;
 
       default:
@@ -169,7 +198,7 @@ chip8.CstrGraphics = (function() {
 
     update: function() {
       // for (var v=0; v<32; v++) {
-      //   for (var ((opcode>>>8)&0xf)=0; ((opcode>>>8)&0xf)<64; ((opcode>>>8)&0xf)++) {
+      //   for (var h=0; h<64; h++) {
       //     area
       //   }
       // }

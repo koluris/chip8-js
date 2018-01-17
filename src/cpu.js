@@ -1,11 +1,20 @@
-#define id\
+#define __id\
   ((opcode>>>12)&0xf)
 
-#define h\
+#define __h\
   ((opcode>>>8)&0xf)
 
-#define kk\
+#define __v\
+  ((opcode>>>4)&0xf)
+
+#define __nnn\
+  (opcode&0xfff)
+
+#define __kk\
   (opcode&0xff)
+
+#define __n\
+  (opcode&0xf)
 
 chip8.CstrProcessor = (function() {
   // General purpose
@@ -19,9 +28,29 @@ chip8.CstrProcessor = (function() {
     // Console
     console.dir(emu.hex(opcode));
 
-    switch(id) {
-      case 6:
-        v[h] = kk;
+    switch(__id) {
+      case 0x3:
+        if (v[__h] === __kk) {
+          pc+=2;
+        }
+        break;
+
+      case 0x6:
+        v[__h] = __kk;
+        break;
+
+      case 0xa:
+        i = __nnn;
+        break;
+
+      case 0xc:
+        v[__h] = Math.floor(Math.random() * 256) & __kk;
+        break;
+
+      case 0xd:
+        console.dir(__h);
+        console.dir(__v);
+        console.dir('BYTE -> '+__n);
         break;
 
       default:
