@@ -92,16 +92,16 @@ chip8.CstrProcessor = (function() {
 
   // CPU step
   function step() {
-    var opcode = chip8.CstrMem.read(pc);
+    var opcode = chip8.CstrMem.read.uh(pc);
     pc+=2;
 
     // Console
     console.dir(chip8.CstrMain.hex(opcode));
 
     switch(((opcode>>>12)&0xf)) {
-      case 0x1:
-        //pc = (opcode&0xfff);
-        break;
+      // case 0x1:
+      //   pc = (opcode&0xfff);
+      //   break;
 
       case 0x3:
         if (v[((opcode>>>8)&0xf)] === (opcode&0xff)) {
@@ -132,6 +132,10 @@ chip8.CstrProcessor = (function() {
 
         // Read from I until I+(opcode&0xf) from ram
         // Render v[((opcode>>>8)&0xf)], v[((opcode>>>4)&0xf)]
+        for (var pt=i; pt<i+(opcode&0xf); pt++) {
+          var hah = chip8.CstrMem.read.ub(pt);
+          console.dir('draw -> '+hah.toString(2));
+        }
         break;
 
       default:
@@ -199,13 +203,24 @@ chip8.CstrMem = (function() {
       }
     },
 
-    read: function(addr) {
-      if (addr >= 0x200 && addr <= 0xfff) {
-        return (ram[addr]<<8) | ram[addr+1];
+    read: {
+      uh: function(addr) {
+        if (addr >= 0x200 && addr <= 0xfff) {
+          return (ram[addr]<<8) | ram[addr+1];
+        }
+        
+        exit('Unknown Read 16 -> '+addr);
+        return 0;
+      },
+
+      ub: function(addr) {
+        if (addr >= 0x200 && addr <= 0xfff) {
+          return ram[addr];
+        }
+
+        exit('Unknown Read 08 -> '+addr);
+        return 0;
       }
-      
-      exit('Unknown mem read -> '+addr);
-      return 0;
     }
   };
 })();
@@ -217,14 +232,14 @@ chip8.CstrGraphics = (function() {
       canvas = $(divCanvas)[0];
       ctx = canvas.getContext('2d');
 
-      ctx.fillStyle = 'black';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // ctx.fillStyle = 'black';
+      // ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(300, 150);
-      ctx.strokeStyle = '#fff';
-      ctx.stroke();
+      // ctx.beginPath();
+      // ctx.moveTo(0, 0);
+      // ctx.lineTo(300, 150);
+      // ctx.strokeStyle = '#fff';
+      // ctx.stroke();
     },
 
     update: function() {
@@ -233,6 +248,10 @@ chip8.CstrGraphics = (function() {
       //     area
       //   }
       // }
+    },
+
+    madeCollision: function() {
+      // var imgData = ctx.getImageData(10, 10, 50, 50);
     }
   };
 })();

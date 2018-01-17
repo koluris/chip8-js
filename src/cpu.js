@@ -22,16 +22,16 @@ chip8.CstrProcessor = (function() {
 
   // CPU step
   function step() {
-    var opcode = mem.read(pc);
+    var opcode = mem.read.uh(pc);
     pc+=2;
 
     // Console
     console.dir(emu.hex(opcode));
 
     switch(__id) {
-      case 0x1:
-        pc = __nnn;
-        break;
+      // case 0x1:
+      //   pc = __nnn;
+      //   break;
 
       case 0x3:
         if (v[__h] === __kk) {
@@ -62,6 +62,10 @@ chip8.CstrProcessor = (function() {
 
         // Read from I until I+__n from ram
         // Render v[__h], v[__v]
+        for (var pt=i; pt<i+__n; pt++) {
+          var hah = mem.read.ub(pt);
+          console.dir('draw -> '+hah.toString(2));
+        }
         break;
 
       default:
