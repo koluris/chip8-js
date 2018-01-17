@@ -134,7 +134,7 @@ chip8.CstrProcessor = (function() {
         // Render v[((opcode>>>8)&0xf)], v[((opcode>>>4)&0xf)]
         for (var pt=i; pt<i+(opcode&0xf); pt++) {
           var hah = chip8.CstrMem.read.ub(pt);
-          console.dir('draw -> '+hah.toString(2));
+          console.dir('draw -> '+chip8.CstrMain.hex(hah));
         }
         break;
 

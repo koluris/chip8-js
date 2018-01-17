@@ -64,7 +64,7 @@ chip8.CstrProcessor = (function() {
         // Render v[__h], v[__v]
         for (var pt=i; pt<i+__n; pt++) {
           var hah = mem.read.ub(pt);
-          console.dir('draw -> '+hah.toString(2));
+          console.dir('draw -> '+emu.hex(hah));
         }
         break;
 
