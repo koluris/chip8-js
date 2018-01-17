@@ -29,9 +29,9 @@ chip8.CstrProcessor = (function() {
     console.dir(emu.hex(opcode));
 
     switch(__id) {
-      // case 0x1:
-      //   pc = __nnn;
-      //   break;
+      case 0x1:
+        pc = __nnn;
+        break;
 
       case 0x3:
         if (v[__h] === __kk) {
@@ -56,15 +56,14 @@ chip8.CstrProcessor = (function() {
         break;
 
       case 0xd:
-        console.dir(__h);
-        console.dir(__v);
-        console.dir('BYTE -> '+__n);
-
-        // Read from I until I+__n from ram
-        // Render v[__h], v[__v]
         for (var pt=i; pt<i+__n; pt++) {
-          var hah = mem.read.ub(pt);
-          console.dir('draw -> '+emu.hex(hah));
+          var chunk = mem.read.ub(pt);
+          var bin   = emu.bin(chunk);
+
+          for (var end=v[__h]+8; end>v[__h]; end--) {
+            render.draw(v[__h], v[__v]);
+          }
+          console.dir('draw -> '+emu.bin(hah));
         }
         break;
 
@@ -89,9 +88,8 @@ chip8.CstrProcessor = (function() {
     },
 
     start: function() {
-      while(1) {
-        step();
-      }
+      step();
+      window.requestAnimationFrame(cpu.start);
     }
   }
 })();

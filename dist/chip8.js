@@ -61,6 +61,10 @@ chip8.CstrMain = (function() {
     hex: function(number) {
       return '0x'+(number>>>0).toString(16);
     },
+
+    bin: function(number) {
+      return number.toString(2);
+    },
     
     // Generic output function
     exit: function(str) {
@@ -99,9 +103,9 @@ chip8.CstrProcessor = (function() {
     console.dir(chip8.CstrMain.hex(opcode));
 
     switch(((opcode>>>12)&0xf)) {
-      // case 0x1:
-      //   pc = (opcode&0xfff);
-      //   break;
+      case 0x1:
+        pc = (opcode&0xfff);
+        break;
 
       case 0x3:
         if (v[((opcode>>>8)&0xf)] === (opcode&0xff)) {
@@ -134,7 +138,7 @@ chip8.CstrProcessor = (function() {
         // Render v[((opcode>>>8)&0xf)], v[((opcode>>>4)&0xf)]
         for (var pt=i; pt<i+(opcode&0xf); pt++) {
           var hah = chip8.CstrMem.read.ub(pt);
-          console.dir('draw -> '+chip8.CstrMain.hex(hah));
+          console.dir('draw -> '+chip8.CstrMain.bin(hah));
         }
         break;
 
@@ -159,9 +163,8 @@ chip8.CstrProcessor = (function() {
     },
 
     start: function() {
-      while(1) {
-        step();
-      }
+      step();
+      window.requestAnimationFrame(chip8.CstrProcessor.start);
     }
   }
 })();

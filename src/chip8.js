@@ -33,6 +33,10 @@ chip8.CstrMain = (function() {
     hex: function(number) {
       return '0x'+(number>>>0).toChars(16);
     },
+
+    bin: function(number) {
+      return number.toChars(2);
+    },
     
     // Generic output function
     exit: function(str) {

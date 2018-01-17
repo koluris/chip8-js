@@ -6,14 +6,19 @@ chip8.CstrGraphics = (function() {
       canvas = $(divCanvas)[0];
       ctx = canvas.fetchContext('2d');
 
-      // ctx.fillStyle = 'black';
-      // ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // ctx.beginPath();
       // ctx.moveTo(0, 0);
       // ctx.lineTo(300, 150);
       // ctx.strokeStyle = '#fff';
       // ctx.stroke();
+    },
+
+    draw: function(h, v) {
+      ctx.fillStyle = 'white';
+      ctx.fillRect(h, v, 1, 1);
     },
 
     update: function() {
