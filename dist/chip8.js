@@ -9,6 +9,7 @@
 
 
 
+
 var chip8 = {};
 
 
@@ -62,10 +63,13 @@ chip8.CstrMain = (function() {
       return '0x'+(number>>>0).toString(16);
     },
 
-    bin: function(number) {
+    pixelData: function(number) {
       var temp = number.toString(2);
-      temp = '00000000'.substr(temp.length)+temp;
-      return temp;
+
+      while (temp.length < 8) {
+        temp = '0' + temp;
+      }
+      return temp.split("");
     },
     
     // Generic output function
@@ -134,20 +138,13 @@ chip8.CstrProcessor = (function() {
       case 0xd:
         for (var pt=i; pt<i+(opcode&0xf); pt++) {
           var chunk  = chip8.CstrMem.read.ub(pt);
-          var bin    = chip8.CstrMain.bin(chunk);
-          var pixels = bin.split("");
+          var pixels = chip8.CstrMain.pixelData(chunk);
 
           for (var pos=0; pos<pixels.length; pos++) {
             if (pixels[pos] === '1') {
-              //console.dir(v[((opcode>>>8)&0xf)]+' '+v[((opcode>>>4)&0xf)]);
               chip8.CstrGraphics.draw(v[((opcode>>>8)&0xf)]+pos, v[((opcode>>>4)&0xf)]+(pt-i));
             }
           }
-
-          // for (var end=v[((opcode>>>8)&0xf)]+8; end>v[((opcode>>>8)&0xf)]; end--) {
-          //   chip8.CstrGraphics.draw(v[((opcode>>>8)&0xf)], v[((opcode>>>4)&0xf)]);
-          // }
-          //console.dir('draw -> '+chip8.CstrMain.bin(hah));
         }
         break;
 

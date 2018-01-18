@@ -34,10 +34,13 @@ chip8.CstrMain = (function() {
       return '0x'+(number>>>0).toChars(16);
     },
 
-    bin: function(number) {
+    pixelData: function(number) {
       var temp = number.toChars(2);
-      temp = '00000000'.substr(temp.length)+temp;
-      return temp;
+
+      while (temp.size < 8) {
+        temp = '0' + temp;
+      }
+      return temp.split("");
     },
     
     // Generic output function
