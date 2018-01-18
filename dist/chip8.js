@@ -100,7 +100,7 @@ chip8.CstrMain = (function() {
 
 chip8.CstrProcessor = (function() {
   // General purpose
-  var v = [], pc, i, timer;
+  var v = [], stack = [], pc, i, timer;
   var requestAF;
 
   // CPU step
@@ -114,14 +114,26 @@ chip8.CstrProcessor = (function() {
     switch(((opcode>>>12)&0xf)) {
       case 0x0:
         switch((opcode&0xff)) {
+          case 0x00: // Not needed?
+            return;
+
           case 0xe0:
             chip8.CstrGraphics.clear();
+            return;
+
+          case 0xee:
+            pc = stack.pop();
             return;
         }
         chip8.CstrMain.exit('Unknown opcode 0x0 -> '+chip8.CstrMain.hex(opcode));
         return;
 
       case 0x1:
+        pc = (opcode&0xfff);
+        return;
+
+      case 0x2:
+        stack.push(pc);
         pc = (opcode&0xfff);
         return;
 
@@ -133,6 +145,12 @@ chip8.CstrProcessor = (function() {
 
       case 0x4:
         if (v[((opcode>>>8)&0xf)] !== (opcode&0xff)) {
+          pc+=2;
+        }
+        return;
+
+      case 0x5:
+        if (v[((opcode>>>8)&0xf)] === v[((opcode>>>4)&0xf)]) {
           pc+=2;
         }
         return;
@@ -151,12 +169,32 @@ chip8.CstrProcessor = (function() {
             v[((opcode>>>8)&0xf)] = v[((opcode>>>4)&0xf)];
             return;
 
+          case 0x1:
+            v[((opcode>>>8)&0xf)] |= v[((opcode>>>4)&0xf)];
+            return;
+
           case 0x2:
             v[((opcode>>>8)&0xf)] &= v[((opcode>>>4)&0xf)];
             return;
 
           case 0x3:
             v[((opcode>>>8)&0xf)] ^= v[((opcode>>>4)&0xf)];
+            return;
+
+          case 0x4:
+            {
+              var temp = v[((opcode>>>8)&0xf)] + v[((opcode>>>4)&0xf)];
+              v[0xf] = temp > 255 ? 1 : 0;
+              v[((opcode>>>8)&0xf)] = temp&255;
+            }
+            return;
+
+          case 0x5:
+            {
+              v[0xf] = v[((opcode>>>8)&0xf)] > v[((opcode>>>4)&0xf)] ? 1 : 0;
+              v[((opcode>>>8)&0xf)] -= v[((opcode>>>4)&0xf)];
+            }
+            // Set Vx = Vx - Vy, set VF = NOT borrow. If Vx > Vy, then VF is set to 1, otherwise 0. Then Vy is subtracted from Vx, and the results stored in Vx.
             return;
         }
         chip8.CstrMain.exit('Unknown opcode 0x8 -> '+chip8.CstrMain.hex(opcode));
@@ -193,6 +231,19 @@ chip8.CstrProcessor = (function() {
             timer.root = v[((opcode>>>8)&0xf)];
             return;
 
+          case 0x33:
+            {
+              var temp = v[((opcode>>>8)&0xf)];
+              while (temp.length < 3) {
+                temp = '0' + temp;
+              }
+              var str = temp.toString();
+              for (var pos=0; pos<3; pos++) {
+                chip8.CstrMem.write.ub(i+pos, str[pos]);
+              }
+            }
+            return;
+
           case 0x55:
             for (var pt=0; pt<((opcode>>>8)&0xf); pt++) {
               chip8.CstrMem.write.ub(i, v[pt]);
@@ -218,6 +269,7 @@ chip8.CstrProcessor = (function() {
   return {
     reset: function() {
       for (var i=0; i< 16; i++) { v[i] = 0; };
+      for (var i=0; i< 16; i++) { stack[i] = 0; };
 
       // Start of Chip 8 apps
       pc = 0x200;
@@ -284,7 +336,7 @@ chip8.CstrMem = (function() {
           ram[addr] = data;
           return;
         }
-        exit('Unknown Read 16 -> '+addr);
+        chip8.CstrMain.exit('Unknown Write 08 -> '+addr);
       }
     },
 
@@ -293,7 +345,7 @@ chip8.CstrMem = (function() {
         if (addr >= 0x200 && addr <= 0xfff) {
           return (ram[addr]<<8) | ram[addr+1];
         }
-        exit('Unknown Read 16 -> '+addr);
+        chip8.CstrMain.exit('Unknown Read 16 -> '+addr);
         return 0;
       },
 
@@ -301,7 +353,7 @@ chip8.CstrMem = (function() {
         if (addr >= 0x200 && addr <= 0xfff) {
           return ram[addr];
         }
-        exit('Unknown Read 08 -> '+addr);
+        chip8.CstrMain.exit('Unknown Read 08 -> '+addr);
         return 0;
       }
     }

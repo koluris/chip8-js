@@ -42,7 +42,7 @@ chip8.CstrMem = (function() {
           ram[addr] = data;
           return;
         }
-        exit('Unknown Read 16 -> '+addr);
+        emu.exit('Unknown Write 08 -> '+addr);
       }
     },
 
@@ -51,7 +51,7 @@ chip8.CstrMem = (function() {
         if (addr >= 0x200 && addr <= 0xfff) {
           return (ram[addr]<<8) | ram[addr+1];
         }
-        exit('Unknown Read 16 -> '+addr);
+        emu.exit('Unknown Read 16 -> '+addr);
         return 0;
       },
 
@@ -59,7 +59,7 @@ chip8.CstrMem = (function() {
         if (addr >= 0x200 && addr <= 0xfff) {
           return ram[addr];
         }
-        exit('Unknown Read 08 -> '+addr);
+        emu.exit('Unknown Read 08 -> '+addr);
         return 0;
       }
     }

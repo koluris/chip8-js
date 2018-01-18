@@ -18,7 +18,7 @@
 
 chip8.CstrProcessor = (function() {
   // General purpose
-  var v = [], pc, i, timer;
+  var v = [], stack = [], pc, i, timer;
   var requestAF;
 
   // CPU step
@@ -32,14 +32,26 @@ chip8.CstrProcessor = (function() {
     switch(__id) {
       case 0x0:
         switch(__kk) {
+          case 0x00: // Not needed?
+            return;
+
           case 0xe0:
             render.clear();
+            return;
+
+          case 0xee:
+            pc = stack.pop();
             return;
         }
         emu.exit('Unknown opcode 0x0 -> '+emu.hex(opcode));
         return;
 
       case 0x1:
+        pc = __nnn;
+        return;
+
+      case 0x2:
+        stack.push(pc);
         pc = __nnn;
         return;
 
@@ -51,6 +63,12 @@ chip8.CstrProcessor = (function() {
 
       case 0x4:
         if (v[__h] !== __kk) {
+          pc+=2;
+        }
+        return;
+
+      case 0x5:
+        if (v[__h] === v[__v]) {
           pc+=2;
         }
         return;
@@ -69,12 +87,32 @@ chip8.CstrProcessor = (function() {
             v[__h] = v[__v];
             return;
 
+          case 0x1:
+            v[__h] |= v[__v];
+            return;
+
           case 0x2:
             v[__h] &= v[__v];
             return;
 
           case 0x3:
             v[__h] ^= v[__v];
+            return;
+
+          case 0x4:
+            {
+              var temp = v[__h] + v[__v];
+              v[0xf] = temp > 255 ? 1 : 0;
+              v[__h] = temp&255;
+            }
+            return;
+
+          case 0x5:
+            {
+              v[0xf] = v[__h] > v[__v] ? 1 : 0;
+              v[__h] -= v[__v];
+            }
+            // Set Vx = Vx - Vy, set VF = NOT borrow. If Vx > Vy, then VF is set to 1, otherwise 0. Then Vy is subtracted from Vx, and the results stored in Vx.
             return;
         }
         emu.exit('Unknown opcode 0x8 -> '+emu.hex(opcode));
@@ -111,6 +149,19 @@ chip8.CstrProcessor = (function() {
             timer.root = v[__h];
             return;
 
+          case 0x33:
+            {
+              var temp = v[__h];
+              while (temp.size < 3) {
+                temp = '0' + temp;
+              }
+              var str = temp.toChars();
+              for (var pos=0; pos<3; pos++) {
+                mem.write.ub(i+pos, str[pos]);
+              }
+            }
+            return;
+
           case 0x55:
             for (var pt=0; pt<__h; pt++) {
               mem.write.ub(i, v[pt]);
@@ -136,6 +187,7 @@ chip8.CstrProcessor = (function() {
   return {
     reset: function() {
       ioZero(v, 16);
+      ioZero(stack, 16);
 
       // Start of Chip 8 apps
       pc = 0x200;
