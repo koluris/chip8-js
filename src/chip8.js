@@ -14,17 +14,18 @@ chip8.CstrMain = (function() {
   }
 
   return {
-    reset: function() {
+    reset: function(app) {
          mem.reset();
          cpu.reset();
       render.reset('#canvas');
 
       // Game
-      request('bin/MAZE', function(resp) {
+      request('bin/'+app, function(resp) {
         // Write app to mem
         mem.upload(resp);
 
         // Start emulation
+        cpu.stop();
         cpu.start();
       });
     },
@@ -45,6 +46,7 @@ chip8.CstrMain = (function() {
     
     // Generic output function
     exit: function(str) {
+      cpu.stop();
       throw str;
     }
   };

@@ -19,6 +19,7 @@
 chip8.CstrProcessor = (function() {
   // General purpose
   var v = [], pc, i, timer;
+  var requestAF;
 
   // CPU step
   function step() {
@@ -31,29 +32,29 @@ chip8.CstrProcessor = (function() {
     switch(__id) {
       case 0x1:
         pc = __nnn;
-        break;
+        return;
 
       case 0x3:
         if (v[__h] === __kk) {
           pc+=2;
         }
-        break;
+        return;
 
       case 0x6:
         v[__h] = __kk;
-        break;
+        return;
 
       case 0x7:
         v[__h] += __kk;
-        break;
+        return;
 
       case 0xa:
         i = __nnn;
-        break;
+        return;
 
       case 0xc:
         v[__h] = Math.floor(Math.random() * 256) & __kk;
-        break;
+        return;
 
       case 0xd:
         for (var pt=i; pt<i+__n; pt++) {
@@ -66,12 +67,10 @@ chip8.CstrProcessor = (function() {
             }
           }
         }
-        break;
-
-      default:
-        emu.exit('Unknown opcode -> '+emu.hex(opcode));
-        break;
+        return;
     }
+
+    emu.exit('Unknown opcode -> '+emu.hex(opcode));
   }
 
   return {
@@ -90,7 +89,12 @@ chip8.CstrProcessor = (function() {
 
     start: function() {
       step();
-      window.requestAnimationFrame(cpu.start);
+      requestAF = requestAnimationFrame(cpu.start);
+    },
+
+    stop: function() {
+      cancelAnimationFrame(requestAF);
+      requestAF = undefined;
     }
   }
 })();

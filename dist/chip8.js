@@ -43,17 +43,18 @@ chip8.CstrMain = (function() {
   }
 
   return {
-    reset: function() {
+    reset: function(app) {
          chip8.CstrMem.reset();
          chip8.CstrProcessor.reset();
       chip8.CstrGraphics.reset('#canvas');
 
       // Game
-      request('bin/MAZE', function(resp) {
+      request('bin/'+app, function(resp) {
         // Write app to chip8.CstrMem
         chip8.CstrMem.upload(resp);
 
         // Start emulation
+        chip8.CstrProcessor.stop();
         chip8.CstrProcessor.start();
       });
     },
@@ -74,6 +75,7 @@ chip8.CstrMain = (function() {
     
     // Generic output function
     exit: function(str) {
+      chip8.CstrProcessor.stop();
       throw str;
     }
   };
@@ -99,6 +101,7 @@ chip8.CstrMain = (function() {
 chip8.CstrProcessor = (function() {
   // General purpose
   var v = [], pc, i, timer;
+  var requestAF;
 
   // CPU step
   function step() {
@@ -111,29 +114,29 @@ chip8.CstrProcessor = (function() {
     switch(((opcode>>>12)&0xf)) {
       case 0x1:
         pc = (opcode&0xfff);
-        break;
+        return;
 
       case 0x3:
         if (v[((opcode>>>8)&0xf)] === (opcode&0xff)) {
           pc+=2;
         }
-        break;
+        return;
 
       case 0x6:
         v[((opcode>>>8)&0xf)] = (opcode&0xff);
-        break;
+        return;
 
       case 0x7:
         v[((opcode>>>8)&0xf)] += (opcode&0xff);
-        break;
+        return;
 
       case 0xa:
         i = (opcode&0xfff);
-        break;
+        return;
 
       case 0xc:
         v[((opcode>>>8)&0xf)] = Math.floor(Math.random() * 256) & (opcode&0xff);
-        break;
+        return;
 
       case 0xd:
         for (var pt=i; pt<i+(opcode&0xf); pt++) {
@@ -141,17 +144,15 @@ chip8.CstrProcessor = (function() {
           var pixels = chip8.CstrMain.pixelData(chunk);
 
           for (var pos=0; pos<pixels.length; pos++) {
-            if (pixels[pos] === '1') {
+            if (pixels[pos] === '1') { // TODO: XOR check
               chip8.CstrGraphics.draw(v[((opcode>>>8)&0xf)]+pos, v[((opcode>>>4)&0xf)]+(pt-i));
             }
           }
         }
-        break;
-
-      default:
-        chip8.CstrMain.exit('Unknown opcode -> '+chip8.CstrMain.hex(opcode));
-        break;
+        return;
     }
+
+    chip8.CstrMain.exit('Unknown opcode -> '+chip8.CstrMain.hex(opcode));
   }
 
   return {
@@ -170,7 +171,12 @@ chip8.CstrProcessor = (function() {
 
     start: function() {
       step();
-      window.requestAnimationFrame(chip8.CstrProcessor.start);
+      requestAF = requestAnimationFrame(chip8.CstrProcessor.start);
+    },
+
+    stop: function() {
+      cancelAnimationFrame(requestAF);
+      requestAF = undefined;
     }
   }
 })();
@@ -243,28 +249,11 @@ chip8.CstrGraphics = (function() {
 
       ctx.fillStyle = 'black';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // ctx.beginPath();
-      // ctx.moveTo(0, 0);
-      // ctx.lineTo(300, 150);
-      // ctx.strokeStyle = '#fff';
-      // ctx.stroke();
     },
 
     draw: function(h, v) {
       ctx.fillStyle = 'white';
       ctx.fillRect(h, v, 1, 1);
-    },
-
-    update: function() {
-      // for (var v=0; v<32; v++) {
-      //   for (var h=0; h<64; h++) {
-      //     area
-      //   }
-      // }
-    },
-
-    madeCollision: function() {
       // var imgData = ctx.getImageData(10, 10, 50, 50);
     }
   };

@@ -7,9 +7,22 @@
   <STYLE>
     @import url('css/normalize.css');
 
+    BODY {
+      font: normal 12px 'Helvetica Neue', sans-serif;
+    }
     #canvas {
+      BACKGROUND: black;
       zoom: 1000%;
-      image-rendering: pixelated;
+      IMAGE-RENDERING: pixelated;
+    }
+    #apps {
+      text-ALIGN: center;
+      MARGIN-top: 20px;
+    }
+    #apps > span {
+      MARGIN-RIGHT: 10px;
+      line-HEIGHT: 20px;
+      cursor: pointer;
     }
   </STYLE>
 </head>
@@ -17,13 +30,48 @@
   <!-- Canvas -->
   <canvas id="canvas" width="64" HEIGHT="32"></canvas>
 
+  <!-- Games -->
+  <div id="apps">
+    <span>15PUZZLE</span>
+    <span>BLINKY</span>
+    <span>BLITZ</span>
+    <span>BREAKOUT</span>
+    <span>BRIX</span>
+    <span>CONNECT4</span>
+    <span>GUESS</span>
+    <span>HIDDEN</span>
+    <span>INVADERS</span>
+    <span>KALEID</span>
+    <span>MAZE</span>
+    <span>MERLIN</span>
+    <span>MISSILE</span>
+    <span>PONG</span>
+    <span>PONG2</span>
+    <span>PUZZLE</span>
+    <span>SQUASH</span>
+    <span>SYZYGY</span>
+    <span>TANK</span>
+    <span>TETRIS</span>
+    <span>TICTAC</span>
+    <span>UFO</span>
+    <span>VBRIX</span>
+    <span>VERS</span>
+    <span>WALL</span>
+    <span>WIPEOFF</span>
+  </div>
+
   <!-- Scripts -->
   <script src="dist/quer-3.2.1.min.js"></script>
   <script src="dist/chip8.js"></script>
 
   <script>
     $(function() {
-      chip8.CstrMain.reset();
+      $('#apps').children('span').each(function(i) {
+        $(this).click(function() {
+          var name = $(this).text();
+          chip8.CstrMain.reset(name);
+        });
+      });
     });
   </script>
 </BODY>
