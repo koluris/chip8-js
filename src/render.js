@@ -8,28 +8,11 @@ chip8.CstrGraphics = (function() {
 
       ctx.fillStyle = 'black';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // ctx.beginPath();
-      // ctx.moveTo(0, 0);
-      // ctx.lineTo(300, 150);
-      // ctx.strokeStyle = '#fff';
-      // ctx.stroke();
     },
 
     draw: function(h, v) {
       ctx.fillStyle = 'white';
       ctx.fillRect(h, v, 1, 1);
-    },
-
-    update: function() {
-      // for (var v=0; v<32; v++) {
-      //   for (var h=0; h<64; h++) {
-      //     area
-      //   }
-      // }
-    },
-
-    madeCollision: function() {
       // var imgData = ctx.getImageData(10, 10, 50, 50);
     }
   };
