@@ -36,12 +36,21 @@ chip8.CstrMem = (function() {
       }
     },
 
+    write: {
+      ub: function(addr, data) {
+        if (addr >= 0x200 && addr <= 0xfff) {
+          ram[addr] = data;
+          return;
+        }
+        exit('Unknown Read 16 -> '+addr);
+      }
+    },
+
     read: {
       uh: function(addr) {
         if (addr >= 0x200 && addr <= 0xfff) {
           return (ram[addr]<<8) | ram[addr+1];
         }
-        
         exit('Unknown Read 16 -> '+addr);
         return 0;
       },
@@ -50,7 +59,6 @@ chip8.CstrMem = (function() {
         if (addr >= 0x200 && addr <= 0xfff) {
           return ram[addr];
         }
-
         exit('Unknown Read 08 -> '+addr);
         return 0;
       }

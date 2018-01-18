@@ -112,6 +112,15 @@ chip8.CstrProcessor = (function() {
     console.dir(chip8.CstrMain.hex(opcode));
 
     switch(((opcode>>>12)&0xf)) {
+      case 0x0:
+        switch((opcode&0xff)) {
+          case 0xe0:
+            chip8.CstrGraphics.clear();
+            return;
+        }
+        chip8.CstrMain.exit('Unknown opcode 0x0 -> '+chip8.CstrMain.hex(opcode));
+        return;
+
       case 0x1:
         pc = (opcode&0xfff);
         return;
@@ -122,12 +131,35 @@ chip8.CstrProcessor = (function() {
         }
         return;
 
+      case 0x4:
+        if (v[((opcode>>>8)&0xf)] !== (opcode&0xff)) {
+          pc+=2;
+        }
+        return;
+
       case 0x6:
         v[((opcode>>>8)&0xf)] = (opcode&0xff);
         return;
 
       case 0x7:
         v[((opcode>>>8)&0xf)] += (opcode&0xff);
+        return;
+
+      case 0x8:
+        switch((opcode&0xf)) {
+          case 0x0:
+            v[((opcode>>>8)&0xf)] = v[((opcode>>>4)&0xf)];
+            return;
+
+          case 0x2:
+            v[((opcode>>>8)&0xf)] &= v[((opcode>>>4)&0xf)];
+            return;
+
+          case 0x3:
+            v[((opcode>>>8)&0xf)] ^= v[((opcode>>>4)&0xf)];
+            return;
+        }
+        chip8.CstrMain.exit('Unknown opcode 0x8 -> '+chip8.CstrMain.hex(opcode));
         return;
 
       case 0xa:
@@ -150,8 +182,36 @@ chip8.CstrProcessor = (function() {
           }
         }
         return;
-    }
 
+      case 0xf:
+        switch((opcode&0xff)) {
+          case 0x07:
+            v[((opcode>>>8)&0xf)] = timer.root;
+            return;
+
+          case 0x15:
+            timer.root = v[((opcode>>>8)&0xf)];
+            return;
+
+          case 0x55:
+            for (var pt=0; pt<((opcode>>>8)&0xf); pt++) {
+              chip8.CstrMem.write.ub(i, v[pt]);
+            }
+            return;
+
+          case 0x65:
+            for (var pt=i; pt<i+0xf; pt++) {
+              v[pt] = chip8.CstrMem.read.ub(pt);
+            }
+            return;
+
+          case 0x1e:
+            i += v[((opcode>>>8)&0xf)];
+            return;
+        }
+        chip8.CstrMain.exit('Unknown opcode 0xf -> '+chip8.CstrMain.hex(opcode));
+        return;
+    }
     chip8.CstrMain.exit('Unknown opcode -> '+chip8.CstrMain.hex(opcode));
   }
 
@@ -218,12 +278,21 @@ chip8.CstrMem = (function() {
       }
     },
 
+    write: {
+      ub: function(addr, data) {
+        if (addr >= 0x200 && addr <= 0xfff) {
+          ram[addr] = data;
+          return;
+        }
+        exit('Unknown Read 16 -> '+addr);
+      }
+    },
+
     read: {
       uh: function(addr) {
         if (addr >= 0x200 && addr <= 0xfff) {
           return (ram[addr]<<8) | ram[addr+1];
         }
-        
         exit('Unknown Read 16 -> '+addr);
         return 0;
       },
@@ -232,7 +301,6 @@ chip8.CstrMem = (function() {
         if (addr >= 0x200 && addr <= 0xfff) {
           return ram[addr];
         }
-
         exit('Unknown Read 08 -> '+addr);
         return 0;
       }
@@ -247,6 +315,10 @@ chip8.CstrGraphics = (function() {
       canvas = $(divCanvas)[0];
       ctx = canvas.getContext('2d');
 
+      chip8.CstrGraphics.clear();
+    },
+
+    clear: function() {
       ctx.fillStyle = 'black';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     },

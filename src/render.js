@@ -6,6 +6,10 @@ chip8.CstrGraphics = (function() {
       canvas = $(divCanvas)[0];
       ctx = canvas.fetchContext('2d');
 
+      render.clear();
+    },
+
+    clear: function() {
       ctx.fillStyle = 'black';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     },

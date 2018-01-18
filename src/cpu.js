@@ -30,6 +30,15 @@ chip8.CstrProcessor = (function() {
     console.dir(emu.hex(opcode));
 
     switch(__id) {
+      case 0x0:
+        switch(__kk) {
+          case 0xe0:
+            render.clear();
+            return;
+        }
+        emu.exit('Unknown opcode 0x0 -> '+emu.hex(opcode));
+        return;
+
       case 0x1:
         pc = __nnn;
         return;
@@ -40,12 +49,35 @@ chip8.CstrProcessor = (function() {
         }
         return;
 
+      case 0x4:
+        if (v[__h] !== __kk) {
+          pc+=2;
+        }
+        return;
+
       case 0x6:
         v[__h] = __kk;
         return;
 
       case 0x7:
         v[__h] += __kk;
+        return;
+
+      case 0x8:
+        switch(__n) {
+          case 0x0:
+            v[__h] = v[__v];
+            return;
+
+          case 0x2:
+            v[__h] &= v[__v];
+            return;
+
+          case 0x3:
+            v[__h] ^= v[__v];
+            return;
+        }
+        emu.exit('Unknown opcode 0x8 -> '+emu.hex(opcode));
         return;
 
       case 0xa:
@@ -68,8 +100,36 @@ chip8.CstrProcessor = (function() {
           }
         }
         return;
-    }
 
+      case 0xf:
+        switch(__kk) {
+          case 0x07:
+            v[__h] = timer.root;
+            return;
+
+          case 0x15:
+            timer.root = v[__h];
+            return;
+
+          case 0x55:
+            for (var pt=0; pt<__h; pt++) {
+              mem.write.ub(i, v[pt]);
+            }
+            return;
+
+          case 0x65:
+            for (var pt=i; pt<i+0xf; pt++) {
+              v[pt] = mem.read.ub(pt);
+            }
+            return;
+
+          case 0x1e:
+            i += v[__h];
+            return;
+        }
+        emu.exit('Unknown opcode 0xf -> '+emu.hex(opcode));
+        return;
+    }
     emu.exit('Unknown opcode -> '+emu.hex(opcode));
   }
 
