@@ -282,7 +282,9 @@ chip8.CstrProcessor = (function() {
     },
 
     start: function() {
-      step();
+      for (var i=0; i<64; i++) {
+        step();
+      }
       requestAF = requestAnimationFrame(chip8.CstrProcessor.start);
     },
 
