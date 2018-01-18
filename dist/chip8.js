@@ -63,7 +63,9 @@ chip8.CstrMain = (function() {
     },
 
     bin: function(number) {
-      return number.toString(2);
+      var temp = number.toString(2);
+      temp = '00000000'.substr(temp.length)+temp;
+      return temp;
     },
     
     // Generic output function
@@ -130,15 +132,22 @@ chip8.CstrProcessor = (function() {
         break;
 
       case 0xd:
-        console.dir(((opcode>>>8)&0xf));
-        console.dir(((opcode>>>4)&0xf));
-        console.dir('BYTE -> '+(opcode&0xf));
-
-        // Read from I until I+(opcode&0xf) from ram
-        // Render v[((opcode>>>8)&0xf)], v[((opcode>>>4)&0xf)]
         for (var pt=i; pt<i+(opcode&0xf); pt++) {
-          var hah = chip8.CstrMem.read.ub(pt);
-          console.dir('draw -> '+chip8.CstrMain.bin(hah));
+          var chunk  = chip8.CstrMem.read.ub(pt);
+          var bin    = chip8.CstrMain.bin(chunk);
+          var pixels = bin.split("");
+
+          for (var pos=0; pos<pixels.length; pos++) {
+            if (pixels[pos] === '1') {
+              //console.dir(v[((opcode>>>8)&0xf)]+' '+v[((opcode>>>4)&0xf)]);
+              chip8.CstrGraphics.draw(v[((opcode>>>8)&0xf)]+pos, v[((opcode>>>4)&0xf)]+(pt-i));
+            }
+          }
+
+          // for (var end=v[((opcode>>>8)&0xf)]+8; end>v[((opcode>>>8)&0xf)]; end--) {
+          //   chip8.CstrGraphics.draw(v[((opcode>>>8)&0xf)], v[((opcode>>>4)&0xf)]);
+          // }
+          //console.dir('draw -> '+chip8.CstrMain.bin(hah));
         }
         break;
 
@@ -235,14 +244,19 @@ chip8.CstrGraphics = (function() {
       canvas = $(divCanvas)[0];
       ctx = canvas.getContext('2d');
 
-      // ctx.fillStyle = 'black';
-      // ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // ctx.beginPath();
       // ctx.moveTo(0, 0);
       // ctx.lineTo(300, 150);
       // ctx.strokeStyle = '#fff';
       // ctx.stroke();
+    },
+
+    draw: function(h, v) {
+      ctx.fillStyle = 'white';
+      ctx.fillRect(h, v, 1, 1);
     },
 
     update: function() {

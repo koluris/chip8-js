@@ -35,7 +35,9 @@ chip8.CstrMain = (function() {
     },
 
     bin: function(number) {
-      return number.toChars(2);
+      var temp = number.toChars(2);
+      temp = '00000000'.substr(temp.length)+temp;
+      return temp;
     },
     
     // Generic output function

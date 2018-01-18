@@ -57,13 +57,21 @@ chip8.CstrProcessor = (function() {
 
       case 0xd:
         for (var pt=i; pt<i+__n; pt++) {
-          var chunk = mem.read.ub(pt);
-          var bin   = emu.bin(chunk);
+          var chunk  = mem.read.ub(pt);
+          var bin    = emu.bin(chunk);
+          var pixels = bin.split("");
 
-          for (var end=v[__h]+8; end>v[__h]; end--) {
-            render.draw(v[__h], v[__v]);
+          for (var pos=0; pos<pixels.length; pos++) {
+            if (pixels[pos] === '1') {
+              //console.dir(v[__h]+' '+v[__v]);
+              render.draw(v[__h]+pos, v[__v]+(pt-i));
+            }
           }
-          console.dir('draw -> '+emu.bin(hah));
+
+          // for (var end=v[__h]+8; end>v[__h]; end--) {
+          //   render.draw(v[__h], v[__v]);
+          // }
+          //console.dir('draw -> '+emu.bin(hah));
         }
         break;
 
